@@ -18,16 +18,16 @@ replicaCount: 1
 services:
   bonusdb:
     name: bonusdb
-    container: cr.yandex/crpn5pvljgfvojro6cs1/bonusdb
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/bonusdb
     replicaCount: 1
     hostPort: 5432
   flightdb:
     name: flightdb
-    container: cr.yandex/crpn5pvljgfvojro6cs1/flightdb
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/flightdb
     replicaCount: 1
     hostPort: 5433
   ticketdb:
     name: ticketdb
-    container: cr.yandex/crpn5pvljgfvojro6cs1/ticketdb
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/ticketdb
     replicaCount: 1
     hostPort: 5434

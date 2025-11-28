@@ -7,7 +7,7 @@ replicaCount: 1
 services:
   bonus-service:
     name: bonus-service
-    container: cr.yandex/crpn5pvljgfvojro6cs1/bonus-service
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/bonus-service
     replicaCount: 1
     env:
       DB_DSN: "host=db-service user=postgres password=password dbname=bonusdb port=5432" # add on deploy like ""
@@ -16,7 +16,7 @@ services:
     targetPort: 8050
   flight-service:
     name: flight-service
-    container: cr.yandex/crpn5pvljgfvojro6cs1/flight-service
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/flight-service
     replicaCount: 1
     env:
       DB_DSN: "host=db-service user=postgres password=password dbname=flightdb port=5432" # add on deploy
@@ -25,7 +25,7 @@ services:
     targetPort: 8060
   ticket-service:
     name: ticket-service
-    container: cr.yandex/crpn5pvljgfvojro6cs1/ticket-service
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/ticket-service
     replicaCount: 1
     env:
       DB_DSN: "host=db-service user=postgres password=password dbname=ticketdb port=5432" # add on deploy
@@ -34,7 +34,7 @@ services:
     targetPort: 8070
   gateway-service:
     name: gateway-service
-    container: cr.yandex/crpn5pvljgfvojro6cs1/gateway-service
+    container: cr.yandex/crp6gtcsesrrbrjeuff6/gateway-service
     replicaCount: 1
     env:
       BONUS_SERVICE_URL: "http://bonus-service/api/v1/"
