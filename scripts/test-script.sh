@@ -1,71 +1,75 @@
-#!/usr/bin/env bash
+  #!/usr/bin/env bash
 
-set -e
+  set -e
 
-variant=${1:-${VARIANT}}
-deployment=${2:-${DEPLOYMENT_NAME}}
-namespace=${3:-${NAMESPACE}}
+  variant=${1:-${VARIANT}}
+  deployment=${2:-${DEPLOYMENT_NAME}}
+  namespace=${3:-${NAMESPACE}}
 
-[[ -z $namespace ]] && namespace="default"
+  [[ -z $namespace ]] && namespace="default"
 
-path=$(dirname "$0")
+  path=$(dirname "$0")
 
-timed() {
-  end=$(date +%s)
-  dt=$(($end - $1))
-  dd=$(($dt / 86400))
-  dt2=$(($dt - 86400 * $dd))
-  dh=$(($dt2 / 3600))
-  dt3=$(($dt2 - 3600 * $dh))
-  dm=$(($dt3 / 60))
-  ds=$(($dt3 - 60 * $dm))
+  timed() {
+    end=$(date +%s)
+    dt=$(($end - $1))
+    dd=$(($dt / 86400))
+    dt2=$(($dt - 86400 * $dd))
+    dh=$(($dt2 / 3600))
+    dt3=$(($dt2 - 3600 * $dh))
+    dm=$(($dt3 / 60))
+    ds=$(($dt3 - 60 * $dm))
 
-  LC_NUMERIC=C printf "\nTotal runtime: %02d min %02d seconds\n" "$dm" "$ds"
-}
+    LC_NUMERIC=C printf "\nTotal runtime: %02d min %02d seconds\n" "$dm" "$ds"
+  }
 
-success() {
-  newman run \
-    --delay-request=100 \
-    --folder=success \
-    --export-environment "$variant"/postman/environment.json \
-    --environment "$variant"/postman/environment.json \
-    "$variant"/postman/collection.json
-}
+  success() {
+    newman run \
+      --delay-request=100 \
+      --folder=success \
+      --export-environment "$variant"/postman/environment.json \
+      --environment "$variant"/postman/environment.json \
+      "$variant"/postman/collection.json
+  }
 
-step() {
-  local step=$1
-  [[ $((step % 2)) -eq 0 ]] && replicas=1 || replicas=0
+  step() {
 
-  printf "=== Step %d: scale %s to %s ===\n" "$step" "$deployment" "$replicas"
+    local step=$1
+    [[ $((step % 2)) -eq 0 ]] && replicas=1 || replicas=0
 
-  kubectl scale deployment "$deployment" -n "$namespace" --replicas "$replicas" 
+    printf "=== Step %d: scale %s to %s ===\n" "$step" "$deployment" "$replicas"
 
-  newman run \
-    --delay-request=100 \
-    --folder=step"$step" \
-    --export-environment "$variant"/postman/environment.json \
-    --environment "$variant"/postman/environment.json \
-    "$variant"/postman/collection.json
+    kubectl scale deployment "$deployment" -n "$namespace" --replicas "$replicas"
 
-  printf "=== Step %d completed ===\n" "$step"
-}
+    printf "Sleep for waiting\n"
+    sleep 30
 
-start=$(date +%s)
-trap 'timed $start' EXIT
+    newman run \
+      --delay-request=100 \
+      --folder=step"$step" \
+      --export-environment "$variant"/postman/environment.json \
+      --environment "$variant"/postman/environment.json \
+      "$variant"/postman/collection.json
 
-printf "=== Start test scenario ===\n"
+    printf "=== Step %d completed ===\n" "$step"
+  }
 
-# success execute
-success
+  start=$(date +%s)
+  trap 'timed $start' EXIT
 
-# stop service
-step 1
+  printf "=== Start test scenario ===\n"
 
-# start service
-step 2
+  # success execute
+  success
 
-# stop service
-step 3
+  # stop service
+  step 1
 
-# start service
-step 4
+  # start service
+  step 2
+
+  # stop service
+  step 3
+
+  # start service
+  step 4
